@@ -10,20 +10,24 @@ app.use(express.json());
 app.use(cors());
 
 // MySQL Connection
-const db = mysql.createConnection({
+
+require('dotenv').config();
+
+const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  port: process.env.DB_PORT,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  url: process.env.DB_URL
 });
 
-db.connect((err) => {
+connection.connect((err) => {
   if (err) {
-    console.error('Database connection failed:', err);
-  } else {
-    console.log('MySQL connected');
+    console.error('Database connection failed:', err.stack);
+    return;
   }
+  console.log('Connected to MySQL database.');
 });
 
 // Signup
