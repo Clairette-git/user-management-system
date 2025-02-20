@@ -207,7 +207,7 @@ function App() {
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
-            <button type="submit">Register</button>
+            <button type="submit">Signup</button>
           </form>
           <button onClick={() => setIsLoginFormVisible(true)}>Already have an account? Login</button>
         </div>

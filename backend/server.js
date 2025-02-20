@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// MySQL Connection
+// The MySQL Connection
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
