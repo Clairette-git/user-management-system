@@ -1,94 +1,158 @@
-require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
-const Joi = require('joi');
+require('dotenv').config();
 
 const app = express();
+app.use(express.json());
 app.use(cors());
-app.use(bodyParser.json());
 
-// Database connection
+// MySQL Connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',  // Change if needed
-  password: 'marcletty12!',  // Change if needed
-  database: 'user_management'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
 });
 
-db.connect(err => {
-  if (err) throw err;
-  console.log('✅ Connected to MySQL');
+db.connect((err) => {
+  if (err) {
+    console.error('Database connection failed:', err);
+  } else {
+    console.log('MySQL connected');
+  }
 });
 
-// JWT Secret Key
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
-
-// Validation Schema
-const userSchema = Joi.object({
-  name: Joi.string().min(3).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
-  role: Joi.string().valid('admin', 'user').required()
-});
-
-// ✅ Register Route
-app.post('/api/register', async (req, res) => {
-  const { error } = userSchema.validate(req.body);
-  if (error) return res.status(400).json({ error: error.details[0].message });
-
-  const { name, email, password, role } = req.body;
+// Signup
+app.post('/register', async (req, res) => {
+  const { username, email, password, role } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
+  const userRole = role || 'user'; 
 
-  db.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-    [name, email, hashedPassword, role],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: 'Registration failed' });
-      res.status(201).json({ message: 'User registered successfully!' });
+  const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
+  db.query(sql, [username, email, hashedPassword, userRole], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Error registering user' });
     }
-  );
-});
-
-// ✅ Login Route
-app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
-
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, result) => {
-    if (err || result.length === 0) return res.status(400).json({ error: 'Invalid credentials' });
-
-    const user = result[0];
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(400).json({ error: 'Invalid credentials' });
-
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    res.status(201).json({ message: 'User registered successfully' });
   });
 });
 
-// ✅ Middleware to Protect Routes
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).json({ error: 'Access denied' });
+// Login 
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const sql = 'SELECT * FROM users WHERE email = ?';
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  db.query(sql, [email], async (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    const user = results[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    res.json({
+      token,
+      user: { id: user.id, username: user.name, email: user.email, role: user.role }
+    });
+  });
+});
+
+//  verify token
+const verifyToken = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access denied. No token provided.' });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({ error: 'Invalid token' });
-    req.user = user;
+    req.user = decoded;
     next();
   });
 };
 
-// ✅ Get Users (Protected Route - Admin Only)
-app.get('/api/users', authenticateToken, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Insufficient permissions' });
+// verify admin role
+const verifyAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+  next();
+};
 
-  db.query('SELECT id, name, email, role FROM users', (err, result) => {
-    if (err) throw err;
-    res.json(result);
+// Change Password 
+app.put('/change-password', verifyToken, async (req, res) => {
+  const { newPassword } = req.body;
+
+  if (!newPassword) {
+    return res.status(400).json({ error: 'New password is required' });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const sql = 'UPDATE users SET password = ? WHERE id = ?';
+
+  db.query(sql, [hashedPassword, req.user.id], (err) => {
+    if (err) return res.status(500).json({ error: 'Error updating password' });
+    res.json({ message: 'Password changed successfully' });
+  });
+});
+
+// Admin Register Users
+app.post('/admin/register', verifyToken, verifyAdmin, async (req, res) => {
+  const { username, email, password, role } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const userRole = role || 'user';
+
+  const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
+  db.query(sql, [username, email, hashedPassword, userRole], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Error registering user' });
+    }
+    res.status(201).json({ message: 'User registered successfully' });
+  });
+});
+
+// Delete user by email (admin only)
+app.delete('/admin/delete-user', verifyToken, verifyAdmin, (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const sql = 'DELETE FROM users WHERE email = ?';
+  db.query(sql, [email], (err, result) => {
+    if (err) {
+      console.error('Error deleting user:', err);
+      return res.status(500).json({ error: 'Error deleting user' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User deleted successfully' });
+  });
+});
+
+//  Get All Users (For Admin)
+app.get('/users', verifyToken, verifyAdmin, (req, res) => {
+  const sql = 'SELECT id, name, email, role FROM users';
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching users:', err);
+      return res.status(500).json({ error: 'Error fetching users' });
+    }
+    res.json({ users: results });
   });
 });
 
 // Start Server
-app.listen(5000, () => console.log('🚀 Backend running on http://localhost:5000'));
+app.listen(5000, () => console.log('Server running on port 5000'));
