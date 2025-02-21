@@ -8,7 +8,7 @@ Features
 •	Validation: Both frontend and backend validate inputs.
 
 ## Prerequisites
-Before you start, ensure you have the following installed:
+Instal:
 •	Node.js (Backend)
 •	npm (Backend and Frontend)
 •	MySQL (Database)
@@ -16,7 +16,7 @@ Before you start, ensure you have the following installed:
 ## MySQL Setup
 1.	Create a MySQL database named user_management and set up the users table:
 sql
-CopyEdit
+
 CREATE DATABASE user_management;
 
 USE user_management;
@@ -32,18 +32,18 @@ CREATE TABLE users (
 ## Backend Setup (Node.js + MySQL)
 1. Clone the repository
 bash
-CopyEdit
+
 git clone <repository_url>
 cd <repository_directory>/backend
 2. Install dependencies
 Install the required dependencies for the backend:
 bash
-CopyEdit
+
 npm install
 3. Configure MySQL connection
 In index.js (located in the backend folder), update the MySQL connection settings:
 javascript
-CopyEdit
+
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',  // Update with your DB username
@@ -52,24 +52,24 @@ const db = mysql.createConnection({
 });
 4. Start the backend server
 bash
-CopyEdit
+
 node index.js
 The backend server should now be running at http://localhost:5000.
 
 Frontend Setup (React)
 1. Clone the repository
 bash
-CopyEdit
+
 git clone <repository_url>
 cd <repository_directory>/frontend
 2. Install dependencies
 Install the required dependencies for the frontend:
 bash
-CopyEdit
+
 npm install
 3. Start the frontend application
 bash
-CopyEdit
+
 npm start
 The React frontend should now be running at http://localhost:3000.
 
