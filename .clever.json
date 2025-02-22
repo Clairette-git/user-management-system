@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "app_id": "app_5ad980b3-9d45-4622-9db5-337defec2eeb",
+      "org_id": "user_78698fcf-94d3-4dc8-b21f-ff0a24e1dc53",
+      "deploy_url": "https://github.com/Clairette-git/user-management-system.git",
+      "git_ssh_url": "https://github.com/Clairette-git/user-management-system.git",
+      "name": "user-management-system",
+      "alias": "user-management-system"
+    }
+  ]
+}
