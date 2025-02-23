@@ -14,21 +14,19 @@ app.use(cors());
 require('dotenv').config();
 
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306,
-  url: process.env.DB_URL
-
+  host: process.env.MYSQL_ADDON_HOST || process.env.DB_HOST,
+  user: process.env.MYSQL_ADDON_USER || process.env.DB_USER,
+  password: process.env.MYSQL_ADDON_PASSWORD || process.env.DB_PASS,
+  database: process.env.MYSQL_ADDON_DB || process.env.DB_NAME,
+  port: process.env.MYSQL_ADDON_PORT || process.env.DB_PORT || 3306
 });
 
 connection.connect((err) => {
   if (err) {
-    console.error('Database connection failed:', err.stack);
+    console.error('Database connection failed:', err);
     return;
   }
-  console.log('Connected to MySQL database.');
+  console.log('Connected to database!');
 });
 
 // Signup
