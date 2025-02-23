@@ -9,6 +9,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get('/api/data', (req, res) => {
+  res.json({ message: 'Data fetched successfully' });
+});
 // MySQL Connection
 
 require('dotenv').config();
