@@ -17,6 +17,11 @@ function App() {
   const [isAdminPanelVisible, setIsAdminPanelVisible] = useState(false);
   const [allUsers, setAllUsers] = useState([]); 
 
+  const apiUrl = process.env.API_URL;
+  fetch(`${apiUrl}/endpoint`)
+    .then(response => response.json())
+    .then(data => console.log(data));
+    
   const handleRegisterChange = (e) => {
     setRegisterForm({ ...registerForm, [e.target.name]: e.target.value });
   };
@@ -28,7 +33,7 @@ function App() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/register', registerForm);
+      const res = await axios.post('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/register', registerForm);
       setMessage(res.data.message);
       setMessageType('success');
       setRegisterForm({ username: '', email: '', password: '', role: 'user' });
@@ -49,7 +54,7 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/login', loginForm);
+      const res = await axios.post('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/login', loginForm);
       setToken(res.data.token);
       setUserRole(res.data.user.role);
       localStorage.setItem('token', res.data.token);
@@ -101,7 +106,7 @@ function App() {
 
     try {
       const res = await axios.put(
-        'http://localhost:5000/change-password',
+        'https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/change-password',
         { newPassword, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -125,7 +130,7 @@ function App() {
 
   const fetchAllUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/users', {
+      const res = await axios.get('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/users', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAllUsers(res.data.users);
@@ -142,7 +147,7 @@ function App() {
   const deleteUser = async (email) => {
     try {
       const token = localStorage.getItem('token'); 
-      const res = await axios.delete('http://localhost:5000/admin/delete-user', {
+      const res = await axios.delete('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/admin/delete-user', {
         headers: { Authorization: `Bearer ${token}` },
         data: { email }  
       });
