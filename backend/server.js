@@ -28,7 +28,18 @@ connection.connect((err) => {
   }
   console.log('Connected to database!');
 });
-
+const fetchData = async () => {
+  try {
+    const response = await fetch('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/api/data');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+  }
+};
 // Signup
 app.post('/register', async (req, res) => {
   const { username, email, password, role } = req.body;
