@@ -47,7 +47,7 @@ app.post('/register', async (req, res) => {
   const userRole = role || 'user'; 
 
   const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
-  db.query(sql, [username, email, hashedPassword, userRole], (err, result) => {
+  connection.query(sql, [username, email, hashedPassword, userRole], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ error: 'Error registering user' });
@@ -61,7 +61,7 @@ app.post('/login', (req, res) => {
   const { email, password } = req.body;
   const sql = 'SELECT * FROM users WHERE email = ?';
 
-  db.query(sql, [email], async (err, results) => {
+  connection.query(sql, [email], async (err, results) => {
     if (err || results.length === 0) {
       return res.status(400).json({ error: 'User not found' });
     }
@@ -112,7 +112,7 @@ app.put('/change-password', verifyToken, async (req, res) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   const sql = 'UPDATE users SET password = ? WHERE id = ?';
 
-  db.query(sql, [hashedPassword, req.user.id], (err) => {
+  connection.query(sql, [hashedPassword, req.user.id], (err) => {
     if (err) return res.status(500).json({ error: 'Error updating password' });
     res.json({ message: 'Password changed successfully' });
   });
@@ -125,7 +125,7 @@ app.post('/admin/register', verifyToken, verifyAdmin, async (req, res) => {
   const userRole = role || 'user';
 
   const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
-  db.query(sql, [username, email, hashedPassword, userRole], (err) => {
+  connection.query(sql, [username, email, hashedPassword, userRole], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ error: 'Error registering user' });
@@ -143,7 +143,7 @@ app.delete('/admin/delete-user', verifyToken, verifyAdmin, (req, res) => {
   }
 
   const sql = 'DELETE FROM users WHERE email = ?';
-  db.query(sql, [email], (err, result) => {
+  connection.query(sql, [email], (err, result) => {
     if (err) {
       console.error('Error deleting user:', err);
       return res.status(500).json({ error: 'Error deleting user' });
@@ -160,7 +160,7 @@ app.delete('/admin/delete-user', verifyToken, verifyAdmin, (req, res) => {
 //  Get All Users (For Admin)
 app.get('/users', verifyToken, verifyAdmin, (req, res) => {
   const sql = 'SELECT id, name, email, role FROM users';
-  db.query(sql, (err, results) => {
+  connection.query(sql, (err, results) => {
     if (err) {
       console.error('Error fetching users:', err);
       return res.status(500).json({ error: 'Error fetching users' });
