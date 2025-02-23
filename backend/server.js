@@ -9,8 +9,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get('/api/data', (req, res) => {
-  res.json({ message: 'Data fetched successfully' });
+app.get('/', (req, res) => {
+  res.send('Server is running and responding to GET requests');
 });
 // MySQL Connection
 
