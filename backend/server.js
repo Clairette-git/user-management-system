@@ -17,8 +17,6 @@ app.get('/', (req, res) => {
 });
 // MySQL Connection
 
-require('dotenv').config();
-
 const connection = mysql.createConnection({
   host: process.env.MYSQL_ADDON_HOST || process.env.DB_HOST,
   user: process.env.MYSQL_ADDON_USER || process.env.DB_USER,
