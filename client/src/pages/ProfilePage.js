@@ -15,7 +15,7 @@ function ProfilePage() {
     const token = localStorage.getItem('token');
     if (token) {
       axios
-        .get('http://localhost:5000/profile', {
+        .get('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -36,7 +36,7 @@ function ProfilePage() {
 
     try {
       const res = await axios.put(
-        'http://localhost:5000/profile/update',
+        'https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/profile/update',
         { username: profile.username, email: profile.email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -53,7 +53,7 @@ function ProfilePage() {
 
     try {
         const res = await axios.put(
-            'http://localhost:5000/profile/password',
+            'https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/profile/password',
             { password: newPassword },
             { headers: { Authorization: `Bearer ${token}` } }
           );

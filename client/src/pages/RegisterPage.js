@@ -12,7 +12,7 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/register', form);
+      const res = await axios.post('https://app-414df6c2-29f7-4816-9069-43ff25e3f558.cleverapps.io/register', form);
       setMessage(res.data.message);
       setForm({ username: '', email: '', password: '' }); 
     } catch (error) {
