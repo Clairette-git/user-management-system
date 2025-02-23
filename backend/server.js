@@ -7,7 +7,10 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://https://user-management-system-fecbrdt7s-ange-uwishemas-projects.vercel.app.app'
+}));
+
 
 app.get('/', (req, res) => {
   res.send('Server is running and responding to GET requests');
@@ -31,6 +34,7 @@ connection.connect((err) => {
   }
   console.log('Connected to database!');
 });
+
 
 // Signup
 app.post('/register', async (req, res) => {
