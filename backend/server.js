@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: 'https://https://user-management-system-fecbrdt7s-ange-uwishemas-projects.vercel.app.app'
+  origin: 'https://user-management-system-fawn-nine.vercel.app/'
 }));
 
 
