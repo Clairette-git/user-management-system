@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+require('dotenv').config({ path: './.env' }); 
 
 const app = express();
 app.use(express.json());
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 // MySQL Connection
 
 
-const connection = mysql.createConnection({
+console.log('Loaded DB Config:', {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
@@ -27,11 +27,19 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT), 
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
 connection.connect((err) => {
   if (err) {
-    console.error('Database connection failed:', err);
+    console.error('❌ Database connection failed:', err);
   } else {
-    console.log('Connected to the database');
+    console.log('✅ Connected to the database');
   }
 });
 // Signup
