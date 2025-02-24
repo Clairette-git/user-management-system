@@ -16,8 +16,7 @@ app.get('/', (req, res) => {
   res.send('Server is running and responding to GET requests');
 });
 // MySQL Connection
-const mysql = require('mysql2');
-require('dotenv').config();
+
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
