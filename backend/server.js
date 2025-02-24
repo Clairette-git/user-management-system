@@ -15,6 +15,7 @@ app.use(cors({
 app.get('/', (req, res) => {
   res.send('Server is running and responding to GET requests');
 });
+
 // MySQL Connection
 
 
