@@ -21,20 +21,19 @@ app.get('/', (req, res) => {
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
   user: process.env.DB_USER,
-  password: process.env.DB_PASS,
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306
 });
 
 connection.connect((err) => {
   if (err) {
     console.error('Database connection failed:', err);
-    return;
+  } else {
+    console.log('Connected to the database');
   }
-  console.log('Connected to Railway MySQL database');
 });
-
 // Signup
 app.post('/register', async (req, res) => {
   const { username, email, password, role } = req.body;
