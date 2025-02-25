@@ -6,9 +6,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 
-app.get('/', (req, res) => {
-  res.send('Server is running and responding to GET requests');
-});
 const allowedOrigins = ['https://user-management-system-fawn-nine.vercel.app/'];
 
 app.use(cors({
