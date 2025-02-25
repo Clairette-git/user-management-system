@@ -5,18 +5,17 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-
-const allowedOrigins = ['https://user-management-system-fawn-nine.vercel.app/'];
-
+const app = express();
+app.use(express.json());
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true, 
+  origin: 'https://user-management-system-fawn-nine.vercel.app/',
+  credentials: true,
 }));
+
+
 app.get('/', (req, res) => {
   res.send('Server is running and responding to GET requests');
 });
-
-app.use(express.json());
 
 // MySQL Connection
 
